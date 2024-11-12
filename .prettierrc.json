@@ -10,10 +10,11 @@
       }
     }
   ],
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "bracketSpacing": true,
   "quoteProps": "as-needed",
   "arrowParens": "always",
   "htmlWhitespaceSensitivity": "css",
-  "semi": true
+  "semi": true,
+  "vueIndentScriptAndStyle": true
 }
