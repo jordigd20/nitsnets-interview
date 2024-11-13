@@ -1,18 +1,13 @@
 <script setup lang="ts">
-  /* eslint-disable no-useless-escape */
   const email = ref('');
   const password = ref('');
   const valid = ref(false);
   const isLoading = ref(false);
 
-  // https://github.com/colinhacks/zod/blob/40e72f9eaf576985f876d1afc2dbc22f73abc1ba/src/types.ts#L595
-  const emailRegex =
-    /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
-
   const rules = {
     email: [
       (value: string) => !!value || 'El correo electrónico es obligatorio',
-      (value: string) => emailRegex.test(value) || 'El correo electrónico debe ser válido'
+      (value: string) => isValidEmail(value) || 'El correo electrónico debe ser válido'
     ],
     password: [(value: string) => !!value || 'La contraseña es obligatoria']
   };
@@ -37,24 +32,24 @@
 
     <v-form v-model="valid" class="auth-form" @submit.prevent="handleSubmit">
       <v-text-field
+        v-model.trim="email"
         label="Correo electrónico"
         type="email"
-        :v-model="email"
         :rules="rules.email"
         required
         variant="outlined"
       ></v-text-field>
 
       <v-text-field
+        v-model.trim="password"
         label="Contraseña"
         type="password"
-        :v-model="password"
         :rules="rules.password"
         required
         variant="outlined"
       ></v-text-field>
 
-      <v-btn type="submit" color="primary" block :loading="isLoading"> Iniciar sesión </v-btn>
+      <v-btn type="submit" color="primary" :loading="isLoading" block> Iniciar sesión </v-btn>
     </v-form>
 
     <footer class="auth-footer">
@@ -63,9 +58,3 @@
     </footer>
   </NuxtLayout>
 </template>
-
-<style scoped>
-  .auth-form .v-input {
-    margin-bottom: 1rem;
-  }
-</style>
