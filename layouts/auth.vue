@@ -36,4 +36,8 @@
     justify-content: space-between;
     padding: 2rem 2rem 1rem 2rem;
   }
+
+  .auth-form .v-input {
+    margin-bottom: 1rem;
+  }
 </style>
