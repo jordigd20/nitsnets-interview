@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 const upperCaseRegex = /[A-Z]/;
-const numberRegex = /[0-9]/;
+const numberRegex = /\d/;
 const symbolRegex = /[-#!$@£%^&*()_+|~=`{}\[\]:";'<>?,.\/\\ ]/;
 
 export const isValidPassword = (password: string): boolean => {
