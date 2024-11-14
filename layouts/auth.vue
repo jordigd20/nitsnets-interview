@@ -38,6 +38,11 @@
   }
 
   .auth-form .v-input {
+    margin-bottom: 0.65rem;
+  }
+
+  .auth-form > .auth-reminder {
+    font-size: 0.875rem;
     margin-bottom: 1rem;
   }
 </style>
