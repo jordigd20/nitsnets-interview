@@ -1,19 +1,17 @@
 <script setup lang="ts">
-  const email = ref('');
+  import { useEmail } from '~/composables/auth';
+
+  const { email, emailRules } = useEmail();
   const password = ref('');
   const valid = ref(false);
   const isLoading = ref(false);
 
   const rules = {
-    email: [
-      (value: string) => !!value || 'El correo electrónico es obligatorio',
-      (value: string) => isValidEmail(value) || 'El correo electrónico debe ser válido'
-    ],
+    email: emailRules,
     password: [(value: string) => !!value || 'La contraseña es obligatoria']
   };
 
-  const handleSubmit = async (e: Event) => {
-    console.log(e, 'Form submitted');
+  const handleSubmit = async () => {
     console.log({ valid: valid.value, email: email.value, password: password.value });
 
     if (!valid.value) {

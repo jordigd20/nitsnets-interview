@@ -1,15 +1,11 @@
 <script setup lang="ts">
-  const email = ref('');
+  import { useEmail } from '~/composables/auth';
+
+  const { email, emailRules } = useEmail();
   const valid = ref(false);
   const isLoading = ref(false);
 
-  const rules = [
-    (value: string) => !!value || 'El correo electrónico es obligatorio',
-    (value: string) => isValidEmail(value) || 'El correo electrónico debe ser válido'
-  ];
-
-  const handleSubmit = async (e: Event) => {
-    console.log(e, 'Form submitted');
+  const handleSubmit = async () => {
     console.log({ valid: valid.value, email: email.value });
 
     if (!valid.value) {
@@ -31,7 +27,7 @@
         v-model.trim="email"
         label="Correo electrónico"
         type="email"
-        :rules="rules"
+        :rules="emailRules"
         required
         variant="outlined"
       ></v-text-field>

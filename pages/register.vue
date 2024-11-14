@@ -1,34 +1,21 @@
 <script setup lang="ts">
-  const email = ref('');
-  const nif = ref('');
-  const password = ref('');
-  const confirmPassword = ref('');
+  import { useEmail, usePassword, useNif, useConfirmPassword } from '~/composables/auth';
+
+  const { email, emailRules } = useEmail();
+  const { password, passwordRules } = usePassword();
+  const { nif, nifRules } = useNif();
+  const { confirmPassword, confirmPasswordRules } = useConfirmPassword(password);
   const valid = ref(false);
   const isLoading = ref(false);
 
   const rules = {
-    email: [
-      (value: string) => !!value || 'El correo electrónico es obligatorio',
-      (value: string) => isValidEmail(value) || 'El correo electrónico debe ser válido'
-    ],
-    nif: [
-      (value: string) => !!value || 'El NIF es obligatorio',
-      (value: string) => isValidNif(value) || 'El NIF debe ser válido'
-    ],
-    password: [
-      (value: string) => !!value || 'La contraseña es obligatoria',
-      (value: string) =>
-        isValidPassword(value) ||
-        'La contraseña debe tener mínimo una mayúscula, un número y un carácter especial'
-    ],
-    confirmPassword: [
-      (value: string) => !!value || 'La confirmación de la contraseña es obligatoria',
-      (value: string) => value === password.value || 'Las contraseñas no coinciden'
-    ]
+    email: emailRules,
+    nif: nifRules,
+    password: passwordRules,
+    confirmPassword: confirmPasswordRules
   };
 
-  const handleSubmit = async (e: Event) => {
-    console.log(e, 'Form submitted');
+  const handleSubmit = async () => {
     console.log({
       valid: valid.value,
       email: email.value,
@@ -37,9 +24,8 @@
       confirmPassword: confirmPassword.value
     });
 
-    if (!valid.value) {
-      return;
-    }
+    if (!valid.value) return;
+    if (password.value !== confirmPassword.value) return;
 
     isLoading.value = true;
     //TODO: Call the register endpoint
