@@ -13,7 +13,8 @@ export default defineNuxtConfig({
         config.plugins?.push(vuetify({ autoImport: true }));
       });
     },
-    '@nuxt/eslint'
+    '@nuxt/eslint',
+    '@pinia/nuxt'
   ],
   vite: {
     vue: {
