@@ -1,5 +1,3 @@
-import { isValidPassword } from '../../utils/validate-password';
-
 export const usePassword = () => {
   const password = ref('');
   const passwordRules = [

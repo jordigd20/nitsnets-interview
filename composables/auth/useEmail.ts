@@ -1,5 +1,3 @@
-import { isValidEmail } from '../../utils/validate-email';
-
 export const useEmail = () => {
   const email = ref('');
   const emailRules = [

@@ -1,5 +1,3 @@
-import { isValidNif } from '../../utils/validate-nif';
-
 export const useNif = () => {
   const nif = ref('');
   const nifRules = [
