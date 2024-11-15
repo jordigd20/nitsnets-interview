@@ -1,25 +1,38 @@
 <script setup lang="ts">
-  import { useEmail } from '~/composables/auth';
+  import { useEmail, usePassword } from '~/composables';
+  import type { User } from '~/interfaces/user.interface';
 
   const { email, emailRules } = useEmail();
-  const password = ref('');
+  const { password, passwordRules } = usePassword();
   const valid = ref(false);
   const isLoading = ref(false);
+  const error = ref('');
 
   const rules = {
     email: emailRules,
-    password: [(value: string) => !!value || 'La contraseña es obligatoria']
+    password: passwordRules
   };
 
   const handleSubmit = async () => {
-    console.log({ valid: valid.value, email: email.value, password: password.value });
-
-    if (!valid.value) {
-      return;
-    }
+    if (!valid.value) return;
 
     isLoading.value = true;
-    //TODO: Call the login endpoint
+
+    try {
+      const response = await useFetchData<{ user: User; token: string }>('/login', 'POST', {
+        email: email.value,
+        password: password.value
+      });
+
+      if (!response) throw new Error('Error al iniciar sesión.');
+
+      console.log(response);
+      await navigateTo('/dashboard');
+    } catch (err) {
+      console.error(err);
+      error.value = 'Error al iniciar sesión.';
+    }
+
     isLoading.value = false;
   };
 </script>
@@ -31,7 +44,7 @@
     <v-form v-model="valid" class="auth-form" @submit.prevent="handleSubmit">
       <v-text-field
         v-model.trim="email"
-        label="Correo electrónico"
+        label="* Correo electrónico"
         type="email"
         :rules="rules.email"
         required
@@ -40,12 +53,19 @@
 
       <v-text-field
         v-model.trim="password"
-        label="Contraseña"
+        label="* Contraseña"
         type="password"
         :rules="rules.password"
         required
         variant="outlined"
       ></v-text-field>
+
+      <p
+        v-if="error"
+        class="alert-error pa-3 text-body-2 border-sm border-error border-opacity-100 rounded mb-4"
+      >
+        {{ error }}
+      </p>
 
       <v-btn type="submit" color="primary" :loading="isLoading" block> Iniciar sesión </v-btn>
     </v-form>

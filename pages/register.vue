@@ -1,13 +1,15 @@
 <script setup lang="ts">
-  import { useEmail, usePassword, useNif, useConfirmPassword } from '~/composables/auth';
+  import { useEmail, usePassword, useNif, useConfirmPassword } from '~/composables';
+  import type { User } from '~/interfaces/user.interface';
 
   const { email, emailRules } = useEmail();
   const { password, passwordRules } = usePassword();
   const { nif, nifRules } = useNif();
   const { confirmPassword, confirmPasswordRules } = useConfirmPassword(password);
   const name = ref('');
-  const valid = ref(false);
   const isLoading = ref(false);
+  const error = ref('');
+  const valid = ref(false);
 
   const rules = {
     email: emailRules,
@@ -17,20 +19,28 @@
   };
 
   const handleSubmit = async () => {
-    console.log({
-      name: name.value,
-      valid: valid.value,
-      email: email.value,
-      nif: nif.value,
-      password: password.value,
-      confirmPassword: confirmPassword.value
-    });
-
     if (!valid.value) return;
     if (password.value !== confirmPassword.value) return;
 
     isLoading.value = true;
-    //TODO: Call the register endpoint
+
+    try {
+      const response = await useFetchData<User>('/register', 'POST', {
+        name: name.value,
+        email: email.value,
+        nif: nif.value,
+        password: password.value
+      });
+
+      if (!response) throw new Error('Error al crear la cuenta.');
+
+      console.log(response);
+      await navigateTo('/');
+    } catch (err) {
+      console.error(err);
+      error.value = 'Error al crear la cuenta.';
+    }
+
     isLoading.value = false;
   };
 </script>
@@ -84,6 +94,13 @@
       ></v-text-field>
 
       <p class="auth-reminder">Los campos marcados con un (*) son obligatorios.</p>
+
+      <p
+        v-if="error"
+        class="alert-error pa-3 text-body-2 border-sm border-error border-opacity-100 rounded mb-4"
+      >
+        {{ error }}
+      </p>
 
       <v-btn type="submit" color="primary" :loading="isLoading" block> Crear cuenta </v-btn>
     </v-form>
