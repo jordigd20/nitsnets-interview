@@ -18,7 +18,7 @@
 
     <footer class="auth-footer">
       <NuxtLink to="/register"> Regístrate </NuxtLink>
-      <NuxtLink to="/recover-password"> Recordar contraseña </NuxtLink>
+      <NuxtLink to="/forgot-password"> ¿Has olvidado tu contraseña? </NuxtLink>
     </footer>
   </NuxtLayout>
 </template>
