@@ -9,8 +9,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value);
 
   const login = async (email: string, password: string) => {
+    isLoading.value = true;
+
     try {
-      isLoading.value = true;
       const response = await $fetch<AuthResponse>(`${BASE_API_URL}/login`, {
         method: 'POST',
         body: {
@@ -18,6 +19,8 @@ export const useAuthStore = defineStore('auth', () => {
           password
         }
       });
+
+      if (!response) throw new Error('Error al iniciar sesión.');
 
       user.value = response.user;
       token.value = response.token;
