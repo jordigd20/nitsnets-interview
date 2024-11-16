@@ -30,12 +30,9 @@
       variant="outlined"
     ></v-text-field>
 
-    <p
-      v-if="error"
-      class="alert-error pa-3 text-body-2 border-sm border-error border-opacity-100 rounded mb-4"
-    >
+    <v-alert v-if="error" class="mb-4" type="error" variant="tonal" density="compact">
       {{ error }}
-    </p>
+    </v-alert>
 
     <v-btn type="submit" color="primary" :loading="isLoading" block> Enviar </v-btn>
   </v-form>

@@ -14,12 +14,12 @@
         body: { email }
       });
 
-      if (!response) throw new Error('Error al recuperar contraseña.');
+      if (!response) throw new Error('Error al enviar el correo.');
 
       isEmailSent.value = true;
     } catch (err) {
       console.error(err);
-      error.value = 'Error al recuperar contraseña.';
+      error.value = 'Error al enviar el correo.';
     }
 
     isLoading.value = false;

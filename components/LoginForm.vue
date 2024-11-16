@@ -40,12 +40,9 @@
       variant="outlined"
     ></v-text-field>
 
-    <p
-      v-if="authStore.error"
-      class="alert-error pa-3 text-body-2 border-sm border-error border-opacity-100 rounded mb-4"
-    >
+    <v-alert v-if="authStore.error" class="mb-4" type="error" variant="tonal" density="compact">
       {{ authStore.error }}
-    </p>
+    </v-alert>
 
     <v-btn type="submit" color="primary" :loading="authStore.isLoading" block>
       Iniciar sesión
