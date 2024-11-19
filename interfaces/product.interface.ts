@@ -2,26 +2,14 @@ export interface Product {
   id: number;
   title: string;
   description: string;
-  brand: string;
   price: number;
-  gender: Genre;
-  color: Color;
+  gender: Gender;
+  isNewCollection: boolean;
   sizes: Size[];
-  category: Category[];
+  category: Category;
   stock: number;
 }
 
-type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
-type Genre = 'men' | 'women' | 'unisex';
-type Category = 't-shirt' | 'shirt' | 'jeans' | 'hoodie' | 'sweatpant' | 'shorts' | 'jacket';
-type Color =
-  | 'red'
-  | 'blue'
-  | 'green'
-  | 'yellow'
-  | 'black'
-  | 'white'
-  | 'purple'
-  | 'orange'
-  | 'pink'
-  | 'brown';
+export type Category = (typeof CATEGORIES)[number];
+export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL' | '3XL';
+export type Gender = 'Hombre' | 'Mujer' | 'Unisex';
