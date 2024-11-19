@@ -1,126 +1,129 @@
 <script setup lang="ts">
-  import { useDisplay } from 'vuetify';
-  import type { Product, ProductsResponse } from '~/interfaces';
+  import type { Product } from '~/interfaces';
 
   definePageMeta({ middleware: 'auth' });
 
   const authStore = useAuthStore();
-  const { smAndUp } = useDisplay();
+  const productsStore = useProductsStore();
+
   const headers = ref([
     { title: 'Id', align: 'start' as const, key: 'id' },
     { title: 'Título', key: 'title' },
-    { title: 'Category', key: 'category' },
-    { title: 'Brand', key: 'brand' },
-    { title: 'Price', key: 'price' },
+    { title: 'Categoría', key: 'category' },
+    { title: 'Género', key: 'gender' },
+    { title: 'Tallas', key: 'sizes' },
+    { title: 'Nueva colección', key: 'isNewCollection' },
+    { title: 'Precio', key: 'price' },
     { title: 'Stock', key: 'stock' },
-    { title: 'Actions', sortable: false, key: 'actions' }
+    { title: 'Acciones', sortable: false, key: 'actions' }
   ]);
-  const products = ref<Product[]>([]);
-  const error = ref('');
+  const editedProduct = ref<Product | null>(null);
+  const dialog = ref(false);
+  const search = ref('');
 
-  const initialize = async () => {
-    const { data, error: responseError } = await useFetch<ProductsResponse>(
-      `${BASE_API_URL}/products`,
-      {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`
-        }
-      }
-    );
+  if (authStore.token) {
+    productsStore.fetchProducts(authStore.token);
+  }
 
-    if (responseError.value || !data.value) {
-      console.error(error);
-      error.value =
-        'Ha ocurrido un error al cargar los productos. Por favor, intentalo de nuevo más tarde.';
+  const handleProductForm = ({ product, type }: { product: Product; type: 'add' | 'edit' }) => {
+    if (type === 'edit') {
+      editProduct(product);
       return;
     }
 
-    products.value = data.value.products;
+    addNewProduct(product);
   };
 
-  const editItem = (item: Product) => {};
-
-  const deleteItem = (item: Product) => {};
-
-  const logout = () => {
-    authStore.logout();
-    navigateTo('/');
+  const editProduct = (product: Product) => {
+    productsStore.editProduct(product);
+    dialog.value = false;
   };
 
-  initialize();
+  const addNewProduct = (product: Product) => {
+    const lastId = productsStore.products.reduce(
+      (acc, product) => (product.id > acc ? product.id : acc),
+      0
+    );
+
+    productsStore.addProduct({
+      ...product,
+      id: lastId + 1
+    });
+    dialog.value = false;
+  };
+
+  const deleteProduct = (isActive: Ref<boolean, boolean>, product: Product) => {
+    productsStore.deleteProduct(product.id);
+    isActive.value = false;
+  };
+
+  const resetDialog = () => {
+    editedProduct.value = null;
+  };
+
+  const openEditDialog = (product: Product) => {
+    editedProduct.value = product;
+    dialog.value = true;
+  };
 </script>
 
 <template>
   <NuxtLayout>
-    <h1>Dashboard</h1>
-    <v-btn @click="logout">Logout</v-btn>
-
-    <!-- <pre>{{ authStore.user ?? 'null' }}</pre> -->
-    <!-- <br /> -->
-    <!-- <span>{{ authStore.token }}</span> -->
+    <h1 class="mb-6">Lista de productos</h1>
 
     <main>
-      <v-data-table
-        :headers="headers"
-        :items="products"
-        :sort-by="[{ key: 'id', order: 'asc' }]"
-        items-per-page="10"
-      >
-        <template #top>
-          <div class="d-flex justify-space-between align-center ga-4">
-            <v-text-field
-              label="Buscar"
-              placeholder="Buscar"
-              variant="outlined"
-              prepend-inner-icon="mdi-magnify"
-              hide-details="auto"
-              density="comfortable"
-              max-width="650px"
-              single-line
-            ></v-text-field>
+      <div class="d-flex justify-space-between align-center ga-4 flex-wrap">
+        <v-text-field
+          v-model.trim="search"
+          label="Buscar"
+          placeholder="Buscar"
+          variant="outlined"
+          prepend-inner-icon="mdi-magnify"
+          hide-details="auto"
+          density="comfortable"
+          max-width="650px"
+          single-line
+        ></v-text-field>
 
-            <div class="d-flex align-center ga-2 ga-sm-4">
+        <div class="d-flex align-center ga-2 ga-sm-4">
+          <v-btn color="primary" size="large" variant="elevated" prepend-icon="mdi-swap-vertical">
+            Ordenar
+          </v-btn>
+
+          <v-dialog v-model="dialog" max-width="600px" @after-leave="resetDialog">
+            <template #activator="{ props }">
               <v-btn
-                v-if="smAndUp"
                 color="primary"
                 size="large"
                 variant="elevated"
-                prepend-icon="mdi-swap-vertical"
+                v-bind="props"
+                prepend-icon="mdi-plus"
               >
-                Ordenar
+                Añadir
               </v-btn>
-              <v-btn
-                v-else
-                color="primary"
-                variant="elevated"
-                rounded="lg"
-                icon="mdi-swap-vertical"
-              ></v-btn>
+            </template>
 
-              <v-dialog max-width="500px">
-                <template #activator="{ props }">
-                  <v-btn
-                    v-if="smAndUp"
-                    color="primary"
-                    size="large"
-                    variant="elevated"
-                    v-bind="props"
-                    prepend-icon="mdi-plus"
-                  >
-                    Añadir
-                  </v-btn>
-                  <v-btn
-                    v-else
-                    color="primary"
-                    variant="elevated"
-                    rounded="lg"
-                    v-bind="props"
-                    icon="mdi-plus"
-                  ></v-btn>
-                </template>
-              </v-dialog>
-            </div>
-          </div>
+            <ProductForm
+              :product="editedProduct"
+              @close-dialog="dialog = false"
+              @submit="handleProductForm"
+            />
+          </v-dialog>
+        </div>
+      </div>
+
+      <v-data-table
+        :headers="headers"
+        :items="productsStore.products"
+        :sort-by="[{ key: 'id', order: 'asc' }]"
+        :loading="productsStore.isLoading"
+        :search="search"
+        items-per-page="10"
+      >
+        <template #[`item.isNewCollection`]="{ item }">
+          <v-chip :color="item.isNewCollection ? 'green' : 'red'" size="small" label>{{
+            item.isNewCollection
+          }}</v-chip>
         </template>
 
         <template #[`item.actions`]="{ item }">
@@ -131,18 +134,33 @@
               density="comfortable"
               rounded="lg"
               icon="mdi-pencil"
-              @click="editItem(item)"
+              @click="openEditDialog(item)"
+            ></v-btn>
+
+            <ConfirmDialog
+              title="Eliminar producto"
+              confirm-text="Eliminar"
+              :is-destructive="true"
+              @confirm="deleteProduct($event, item)"
             >
-            </v-btn>
-            <v-btn
-              color="error"
-              variant="text"
-              density="comfortable"
-              rounded="lg"
-              icon="mdi-delete"
-              @click="deleteItem(item)"
-            >
-            </v-btn>
+              <template #confirmActivator="{ props }">
+                <v-btn
+                  color="error"
+                  variant="text"
+                  density="comfortable"
+                  rounded="lg"
+                  icon="mdi-delete"
+                  v-bind="props"
+                ></v-btn>
+              </template>
+              <template #description>
+                <div>
+                  <span class="opacity-90">¿Estás seguro de que quieres eliminar </span>
+                  <strong>{{ item.title }}</strong
+                  ><span class="opacity-90">?</span>
+                </div>
+              </template>
+            </ConfirmDialog>
           </div>
         </template>
       </v-data-table>
