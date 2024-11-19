@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  const { title, confirmText, isDestructive } = defineProps<{
+  const { title, confirmText, isDestructive, isLoading } = defineProps<{
     title: string;
     confirmText: string;
     isDestructive: boolean;
+    isLoading: boolean;
   }>();
   const emit = defineEmits<{
     confirm: [Ref<boolean, boolean>];
@@ -23,8 +24,9 @@
         <div class="mt-3 d-flex justify-center ga-2">
           <v-btn variant="text" size="large" @click="isActive.value = false"> Cancelar </v-btn>
           <v-btn
-            :color="isDestructive ? 'error' : 'primary'"
             size="large"
+            :color="isDestructive ? 'error' : 'primary'"
+            :loading="isLoading"
             @click="() => emit('confirm', isActive)"
           >
             {{ confirmText }}
