@@ -33,27 +33,68 @@ export const useProductsStore = defineStore('products', () => {
     return products.value.find((product) => product.id === productId);
   };
 
-  const addProduct = (product: Product) => {
-    products.value.push(product);
+  const addProduct = async (product: Product) => {
+    isLoading.value = true;
+
+    const response = await $fetch<Product>(`${BASE_API_URL}/products`, {
+      method: 'POST',
+      body: product
+    });
+
+    if (!response) {
+      isLoading.value = false;
+      throw new Error('Ha ocurrido un error al crear el producto');
+    }
+
+    const lastId = products.value.reduce(
+      (acc, product) => (product.id > acc ? product.id : acc),
+      0
+    );
+    products.value.push({ ...product, id: lastId + 1 });
+    error.value = null;
+    isLoading.value = false;
   };
 
-  const editProduct = (product: Product) => {
+  const editProduct = async (product: Product) => {
+    isLoading.value = true;
+
+    const response = await $fetch<Product>(`${BASE_API_URL}/products/${product.id}`, {
+      method: 'PUT',
+      body: product
+    });
+
+    if (!response) {
+      isLoading.value = false;
+      throw new Error('Ha ocurrido un error al editar el producto');
+    }
+
     const index = products.value.findIndex((p) => p.id === product.id);
     products.value[index] = product;
+    error.value = null;
+    isLoading.value = false;
   };
 
-  const deleteProduct = (productId: number) => {
+  const deleteProduct = async (productId: number) => {
+    isLoading.value = true;
+
+    const response = await $fetch<{ message: string; status: string }>(
+      `${BASE_API_URL}/products/${productId}`,
+      { method: 'DELETE' }
+    );
+
+    if (!response) {
+      isLoading.value = false;
+      throw new Error('Ha ocurrido un error al eliminar el producto');
+    }
+
     const index = products.value.findIndex((p) => p.id === productId);
     products.value.splice(index, 1);
+    error.value = null;
+    isLoading.value = false;
   };
 
-  const searchProduct = (searchTerm: string) => {
-    const search = searchTerm.toLowerCase();
-    return products.value.filter(
-      (product) =>
-        product.title.toLowerCase().includes(search) ||
-        product.description.toLowerCase().includes(search)
-    );
+  const setError = (errorMessage: string) => {
+    error.value = errorMessage;
   };
 
   return {
@@ -65,6 +106,6 @@ export const useProductsStore = defineStore('products', () => {
     addProduct,
     editProduct,
     deleteProduct,
-    searchProduct
+    setError
   };
 });
