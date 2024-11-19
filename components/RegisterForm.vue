@@ -29,6 +29,7 @@
   const valid = ref(false);
 
   const rules = {
+    name: [(v: string) => v.length <= 30 || 'El nombre debe tener menos de 30 caracteres'],
     email: emailRules,
     nif: nifRules,
     password: passwordRules,
@@ -42,7 +43,13 @@
     class="auth-form"
     @submit.prevent="() => emit('submit', { valid, name, email, nif, password, confirmPassword })"
   >
-    <v-text-field v-model.trim="name" label="Nombre" type="text" variant="outlined"></v-text-field>
+    <v-text-field
+      v-model.trim="name"
+      :rules="rules.name"
+      label="Nombre"
+      type="text"
+      variant="outlined"
+    ></v-text-field>
 
     <v-text-field
       v-model.trim="email"
