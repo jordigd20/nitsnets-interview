@@ -30,7 +30,10 @@
   const valid = ref(false);
 
   const rules = {
-    title: [(v: string) => !!v || 'El título es obligatorio'],
+    title: [
+      (v: string) => !!v || 'El título es obligatorio',
+      (v: string) => v.length <= 100 || 'El título debe tener menos de 100 caracteres'
+    ],
     category: [
       (v: string) => !!v || 'La categoría es obligatoria',
       (v: string) => (CATEGORIES as readonly string[]).includes(v) || 'La categoría no es válida'
@@ -186,9 +189,7 @@
           </v-row>
 
           <v-row class="justify-end ga-2 py-2">
-            <v-btn size="large" color="primary" variant="text" @click="() => emit('closeDialog')">
-              Cancelar
-            </v-btn>
+            <v-btn size="large" variant="text" @click="() => emit('closeDialog')"> Cancelar </v-btn>
             <v-btn type="submit" size="large" class="text-none" color="primary" variant="flat">
               Guardar
             </v-btn>
