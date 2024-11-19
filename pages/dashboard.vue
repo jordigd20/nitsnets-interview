@@ -34,31 +34,39 @@
     addNewProduct(product);
   };
 
-  const editProduct = (product: Product) => {
-    productsStore.editProduct(product);
-    dialog.value = false;
+  const editProduct = async (product: Product) => {
+    try {
+      await productsStore.editProduct(product);
+      dialog.value = false;
+    } catch (error) {
+      console.error(error);
+      productsStore.setError('Ha ocurrido un error al editar el producto');
+    }
   };
 
-  const addNewProduct = (product: Product) => {
-    const lastId = productsStore.products.reduce(
-      (acc, product) => (product.id > acc ? product.id : acc),
-      0
-    );
-
-    productsStore.addProduct({
-      ...product,
-      id: lastId + 1
-    });
-    dialog.value = false;
+  const addNewProduct = async (product: Product) => {
+    try {
+      await productsStore.addProduct(product);
+      dialog.value = false;
+    } catch (error) {
+      console.error(error);
+      productsStore.setError('Ha ocurrido un error al añadir el producto');
+    }
   };
 
-  const deleteProduct = (isActive: Ref<boolean, boolean>, product: Product) => {
-    productsStore.deleteProduct(product.id);
-    isActive.value = false;
+  const deleteProduct = async (isDialogActive: Ref<boolean, boolean>, product: Product) => {
+    try {
+      await productsStore.deleteProduct(product.id);
+      isDialogActive.value = false;
+    } catch (error) {
+      console.error(error);
+      productsStore.setError('Ha ocurrido un error al eliminar el producto');
+    }
   };
 
   const resetDialog = () => {
     editedProduct.value = null;
+    productsStore.error = null;
   };
 
   const openEditDialog = (product: Product) => {
@@ -83,6 +91,7 @@
           density="comfortable"
           max-width="650px"
           single-line
+          clearable
         ></v-text-field>
 
         <div class="d-flex align-center ga-2 ga-sm-4">
@@ -105,6 +114,8 @@
 
             <ProductForm
               :product="editedProduct"
+              :is-loading="productsStore.isLoading"
+              :error="productsStore.error"
               @close-dialog="dialog = false"
               @submit="handleProductForm"
             />
@@ -119,6 +130,7 @@
         :loading="productsStore.isLoading"
         :search="search"
         items-per-page="10"
+        no-data-text="No se encontraron productos"
       >
         <template #[`item.isNewCollection`]="{ item }">
           <v-chip :color="item.isNewCollection ? 'green' : 'red'" size="small" label>{{
@@ -141,6 +153,7 @@
               title="Eliminar producto"
               confirm-text="Eliminar"
               :is-destructive="true"
+              :is-loading="productsStore.isLoading"
               @confirm="deleteProduct($event, item)"
             >
               <template #confirmActivator="{ props }">
