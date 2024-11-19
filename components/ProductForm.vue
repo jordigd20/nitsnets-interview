@@ -6,6 +6,8 @@
 
   const { product: productProp } = defineProps<{
     product: Product | null;
+    isLoading: boolean;
+    error: string | null;
   }>();
   const emit = defineEmits<{
     closeDialog: [];
@@ -38,14 +40,8 @@
       (v: string) => !!v || 'La categoría es obligatoria',
       (v: string) => (CATEGORIES as readonly string[]).includes(v) || 'La categoría no es válida'
     ],
-    price: [
-      (v: number) => !!v || 'El precio es obligatorio',
-      (v: number) => v >= 0 || 'El precio debe ser mayor o igual a 0'
-    ],
-    stock: [
-      (v: number) => !!v || 'El stock es obligatorio',
-      (v: number) => v >= 0 || 'El stock debe ser mayor o igual a 0'
-    ]
+    price: [(v: number) => v > 0 || 'El precio debe ser mayor a 0'],
+    stock: [(v: number) => v >= 0 || 'El stock debe ser mayor o igual a 0']
   };
   const buttonSizes = {
     xs: 'x-small',
@@ -188,9 +184,22 @@
             <p>Los campos marcados con un (*) son obligatorios.</p>
           </v-row>
 
+          <v-row>
+            <v-alert v-if="error" class="my-1" type="error" variant="tonal" density="compact">
+              {{ error }}
+            </v-alert>
+          </v-row>
+
           <v-row class="justify-end ga-2 py-2">
             <v-btn size="large" variant="text" @click="() => emit('closeDialog')"> Cancelar </v-btn>
-            <v-btn type="submit" size="large" class="text-none" color="primary" variant="flat">
+            <v-btn
+              type="submit"
+              size="large"
+              class="text-none"
+              color="primary"
+              variant="flat"
+              :loading="isLoading"
+            >
               Guardar
             </v-btn>
           </v-row>
