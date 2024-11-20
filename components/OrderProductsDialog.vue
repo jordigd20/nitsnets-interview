@@ -18,14 +18,17 @@
     disabled: false,
     ghostClass: 'ghost'
   });
-
-  const productsList = ref(products.map((product) => ({ id: product.id, name: product.title })));
+  const dragging = ref(false);
+  const hasConfirmed = ref(false);
+  const initialList = ref<{ id: number; name: string }[]>(
+    products.map((product) => ({ id: product.id, name: product.title }))
+  );
+  const productsList = ref<{ id: number; name: string }[]>(initialList.value);
 
   watch(
     () => productsStore.products,
     (updatedProducts) => {
-      console.log('updatedProducts', updatedProducts);
-      productsList.value = updatedProducts.map((product) => ({
+      initialList.value = updatedProducts.map((product) => ({
         id: product.id,
         name: product.title
       }));
@@ -39,14 +42,24 @@
       return foundProduct as Product;
     });
 
+    hasConfirmed.value = true;
     emit('confirm', { isDialogActive: isActive, products: reorderedProducts });
   };
 
-  const dragging = ref(false);
+  const onAfterEnter = () => {
+    productsList.value = initialList.value;
+  };
+
+  const onAfterLeave = () => {
+    if (hasConfirmed.value) return;
+
+    productsList.value = initialList.value;
+    hasConfirmed.value = false;
+  };
 </script>
 
 <template>
-  <v-dialog max-width="600px">
+  <v-dialog max-width="600px" @after-enter="onAfterEnter" @after-leave="onAfterLeave">
     <template #activator="{ props }">
       <slot name="activator" :props="props" />
     </template>
