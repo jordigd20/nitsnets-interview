@@ -26,9 +26,14 @@
   const dialog = ref(false);
   const search = ref('');
   const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
+  const productsError = ref<string | null>(null);
 
   if (authStore.token) {
-    productsStore.fetchProducts(authStore.token);
+    try {
+      await productsStore.fetchProducts(authStore.token);
+    } catch (error) {
+      productsError.value = (error as Error).message;
+    }
   }
 
   const handleProductForm = ({ product, type }: { product: Product; type: 'add' | 'edit' }) => {
@@ -104,9 +109,20 @@
 
 <template>
   <NuxtLayout>
-    <h1 class="mb-6">Lista de productos</h1>
+    <v-empty-state
+      v-if="productsError"
+      class="text-body-1"
+      action-text="Reintentar"
+      image="https://cdn.vuetifyjs.com/docs/images/components/v-empty-state/connection.svg"
+      text="Parece que algo salió mal al cargar los productos. Por favor, intentalo de nuevo más tarde o contacta conmigo si el problema persiste."
+      title="Algo salió mal..."
+      @click:action="reloadNuxtApp()"
+    >
+    </v-empty-state>
 
-    <main>
+    <main v-else>
+      <h1 class="mb-6">Lista de productos</h1>
+
       <div class="d-flex justify-space-between align-center ga-4 flex-wrap">
         <v-text-field
           v-model.trim="search"

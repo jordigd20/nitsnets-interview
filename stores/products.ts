@@ -19,13 +19,11 @@ export const useProductsStore = defineStore('products', () => {
 
     if (responseError.value || !data.value) {
       console.error(error);
-      error.value =
-        'Ha ocurrido un error al cargar los productos. Por favor, intentalo de nuevo más tarde.';
-      return;
+      isLoading.value = false;
+      throw new Error('Ha ocurrido un error al cargar los productos');
     }
 
     products.value = data.value.products;
-    error.value = null;
     isLoading.value = false;
   };
 
