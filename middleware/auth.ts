@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async () => {
     return navigateTo('/');
   }
 
-  const { data, error } = await useFetch<AuthResponse>(`${BASE_API_URL}/login`, {
+  const { data, error } = await useFetch<AuthResponse>(`${BASE_API_URL}/refresh-token`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`
