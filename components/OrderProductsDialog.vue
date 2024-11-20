@@ -21,13 +21,17 @@
 
   const productsList = ref(products.map((product) => ({ id: product.id, name: product.title })));
 
-  watch(productsStore.products, (updatedProducts) => {
-    console.log('updatedProducts', updatedProducts);
-    productsList.value = updatedProducts.map((product) => ({
-      id: product.id,
-      name: product.title
-    }));
-  });
+  watch(
+    () => productsStore.products,
+    (updatedProducts) => {
+      console.log('updatedProducts', updatedProducts);
+      productsList.value = updatedProducts.map((product) => ({
+        id: product.id,
+        name: product.title
+      }));
+    },
+    { deep: true }
+  );
 
   const handleReorderProducts = (isActive: Ref<boolean, boolean>) => {
     const reorderedProducts = productsList.value.map((product) => {
