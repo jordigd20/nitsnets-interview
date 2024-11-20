@@ -42,7 +42,6 @@ export const useProductsStore = defineStore('products', () => {
     });
 
     if (!response) {
-      isLoading.value = false;
       throw new Error('Ha ocurrido un error al crear el producto');
     }
 
@@ -64,7 +63,6 @@ export const useProductsStore = defineStore('products', () => {
     });
 
     if (!response) {
-      isLoading.value = false;
       throw new Error('Ha ocurrido un error al editar el producto');
     }
 
@@ -83,7 +81,6 @@ export const useProductsStore = defineStore('products', () => {
     );
 
     if (!response) {
-      isLoading.value = false;
       throw new Error('Ha ocurrido un error al eliminar el producto');
     }
 
@@ -93,8 +90,29 @@ export const useProductsStore = defineStore('products', () => {
     isLoading.value = false;
   };
 
+  const reorderProducts = async (newProducts: Product[]) => {
+    isLoading.value = true;
+
+    const response = await $fetch<Product[]>(`${BASE_API_URL}/products/reorder`, {
+      method: 'PUT',
+      body: newProducts.map((product) => product.id)
+    });
+
+    if (!response) {
+      throw new Error('Ha ocurrido un error al reordenar los productos');
+    }
+
+    products.value = [...newProducts];
+    error.value = null;
+    isLoading.value = false;
+  };
+
   const setError = (errorMessage: string) => {
     error.value = errorMessage;
+  };
+
+  const setIsLoading = (loading: boolean) => {
+    isLoading.value = loading;
   };
 
   return {
@@ -106,6 +124,8 @@ export const useProductsStore = defineStore('products', () => {
     addProduct,
     editProduct,
     deleteProduct,
-    setError
+    reorderProducts,
+    setError,
+    setIsLoading
   };
 });

@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import type { Product } from '~/interfaces';
 
+  type SortItem = {
+    key: string;
+    order?: boolean | 'asc' | 'desc';
+  };
+
   definePageMeta({ middleware: 'auth' });
 
   const authStore = useAuthStore();
@@ -20,6 +25,7 @@
   const editedProduct = ref<Product | null>(null);
   const dialog = ref(false);
   const search = ref('');
+  const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
 
   if (authStore.token) {
     productsStore.fetchProducts(authStore.token);
@@ -40,6 +46,7 @@
       dialog.value = false;
     } catch (error) {
       console.error(error);
+      productsStore.setIsLoading(false);
       productsStore.setError('Ha ocurrido un error al editar el producto');
     }
   };
@@ -50,6 +57,7 @@
       dialog.value = false;
     } catch (error) {
       console.error(error);
+      productsStore.setIsLoading(false);
       productsStore.setError('Ha ocurrido un error al añadir el producto');
     }
   };
@@ -60,7 +68,26 @@
       isDialogActive.value = false;
     } catch (error) {
       console.error(error);
+      productsStore.setIsLoading(false);
       productsStore.setError('Ha ocurrido un error al eliminar el producto');
+    }
+  };
+
+  const reorderProducts = async ({
+    isDialogActive,
+    products
+  }: {
+    isDialogActive: Ref<boolean, boolean>;
+    products: Product[];
+  }) => {
+    try {
+      await productsStore.reorderProducts(products);
+      sortBy.value = [];
+      isDialogActive.value = false;
+    } catch (error) {
+      console.error(error);
+      productsStore.setIsLoading(false);
+      productsStore.setError('Ha ocurrido un error al reordenar los productos');
     }
   };
 
@@ -95,9 +122,24 @@
         ></v-text-field>
 
         <div class="d-flex align-center ga-2 ga-sm-4">
-          <v-btn color="primary" size="large" variant="elevated" prepend-icon="mdi-swap-vertical">
-            Ordenar
-          </v-btn>
+          <OrderProductsDialog
+            :products="productsStore.products"
+            :is-loading="productsStore.isLoading"
+            :error="productsStore.error"
+            @confirm="reorderProducts"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                color="primary"
+                size="large"
+                variant="elevated"
+                prepend-icon="mdi-swap-vertical"
+                v-bind="props"
+              >
+                Ordenar
+              </v-btn>
+            </template>
+          </OrderProductsDialog>
 
           <v-dialog v-model="dialog" max-width="600px" @after-leave="resetDialog">
             <template #activator="{ props }">
@@ -126,7 +168,7 @@
       <v-data-table
         :headers="headers"
         :items="productsStore.products"
-        :sort-by="[{ key: 'id', order: 'asc' }]"
+        :sort-by="sortBy"
         :loading="productsStore.isLoading"
         :search="search"
         items-per-page="10"
