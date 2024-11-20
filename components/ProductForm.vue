@@ -40,8 +40,16 @@
       (v: string) => !!v || 'La categoría es obligatoria',
       (v: string) => (CATEGORIES as readonly string[]).includes(v) || 'La categoría no es válida'
     ],
-    price: [(v: number) => v > 0 || 'El precio debe ser mayor a 0'],
-    stock: [(v: number) => v >= 0 || 'El stock debe ser mayor o igual a 0']
+    price: [
+      (v: number | string) =>
+        (v !== null && v !== undefined && v !== '') || 'El precio es obligatorio',
+      (v: number) => v > 0 || 'El precio debe ser mayor a 0'
+    ],
+    stock: [
+      (v: number | string) =>
+        (v !== null && v !== undefined && v !== '') || 'El stock es obligatorio',
+      (v: number) => v >= 0 || 'El stock debe ser mayor o igual a 0'
+    ]
   };
   const buttonSizes = {
     xs: 'x-small',
