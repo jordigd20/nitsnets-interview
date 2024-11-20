@@ -22,8 +22,6 @@
     { title: 'Stock', key: 'stock' },
     { title: 'Acciones', sortable: false, key: 'actions' }
   ]);
-  const editedProduct = ref<Product | null>(null);
-  const dialog = ref(false);
   const search = ref('');
   const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
   const productsError = ref<string | null>(null);
@@ -36,34 +34,37 @@
     }
   }
 
-  const handleProductForm = ({ product, type }: { product: Product; type: 'add' | 'edit' }) => {
-    if (type === 'edit') {
-      editProduct(product);
-      return;
-    }
-
-    addNewProduct(product);
-  };
-
-  const editProduct = async (product: Product) => {
-    try {
-      await productsStore.editProduct(product);
-      dialog.value = false;
-    } catch (error) {
-      console.error(error);
-      productsStore.setIsLoading(false);
-      productsStore.setError('Ha ocurrido un error al editar el producto');
-    }
-  };
-
-  const addNewProduct = async (product: Product) => {
+  const addNewProduct = async ({
+    product,
+    isDialogActive
+  }: {
+    product: Product;
+    isDialogActive: Ref<boolean, boolean>;
+  }) => {
     try {
       await productsStore.addProduct(product);
-      dialog.value = false;
+      isDialogActive.value = false;
     } catch (error) {
       console.error(error);
       productsStore.setIsLoading(false);
       productsStore.setError('Ha ocurrido un error al añadir el producto');
+    }
+  };
+
+  const editProduct = async ({
+    product,
+    isDialogActive
+  }: {
+    product: Product;
+    isDialogActive: Ref<boolean, boolean>;
+  }) => {
+    try {
+      await productsStore.editProduct(product);
+      isDialogActive.value = false;
+    } catch (error) {
+      console.error(error);
+      productsStore.setIsLoading(false);
+      productsStore.setError('Ha ocurrido un error al editar el producto');
     }
   };
 
@@ -94,16 +95,6 @@
       productsStore.setIsLoading(false);
       productsStore.setError('Ha ocurrido un error al reordenar los productos');
     }
-  };
-
-  const resetDialog = () => {
-    editedProduct.value = null;
-    productsStore.error = null;
-  };
-
-  const openEditDialog = (product: Product) => {
-    editedProduct.value = product;
-    dialog.value = true;
   };
 </script>
 
@@ -157,7 +148,7 @@
             </template>
           </OrderProductsDialog>
 
-          <v-dialog v-model="dialog" max-width="600px" @after-leave="resetDialog">
+          <ProductDialog @submit="addNewProduct">
             <template #activator="{ props }">
               <v-btn
                 color="primary"
@@ -169,15 +160,7 @@
                 Añadir
               </v-btn>
             </template>
-
-            <ProductForm
-              :product="editedProduct"
-              :is-loading="productsStore.isLoading"
-              :error="productsStore.error"
-              @close-dialog="dialog = false"
-              @submit="handleProductForm"
-            />
-          </v-dialog>
+          </ProductDialog>
         </div>
       </div>
 
@@ -198,14 +181,18 @@
 
         <template #[`item.actions`]="{ item }">
           <div class="d-flex">
-            <v-btn
-              color="primary"
-              variant="text"
-              density="comfortable"
-              rounded="lg"
-              icon="mdi-pencil"
-              @click="openEditDialog(item)"
-            ></v-btn>
+            <ProductDialog :edited-product="item" @submit="editProduct">
+              <template #activator="{ props }">
+                <v-btn
+                  color="primary"
+                  variant="text"
+                  density="comfortable"
+                  rounded="lg"
+                  icon="mdi-pencil"
+                  v-bind="props"
+                ></v-btn>
+              </template>
+            </ProductDialog>
 
             <ConfirmDialog
               title="Eliminar producto"

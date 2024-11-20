@@ -5,13 +5,13 @@
   type ProductWithOptionalCategory = Omit<Product, 'category'> & { category?: Category };
 
   const { product: productProp } = defineProps<{
-    product: Product | null;
+    product?: Product;
     isLoading: boolean;
     error: string | null;
   }>();
   const emit = defineEmits<{
     closeDialog: [];
-    submit: [{ product: Product; type: 'add' | 'edit' }];
+    submit: [{ product: Product }];
   }>();
   const { name } = useDisplay();
 
@@ -66,15 +66,17 @@
     const newProduct: Product = {
       ...defaultProduct,
       ...selectedProduct.value,
-      category: selectedProduct.value.category!
+      category: selectedProduct.value.category!,
+      price: +selectedProduct.value.price,
+      stock: +selectedProduct.value.stock
     };
 
     if (productProp) {
-      emit('submit', { product: newProduct, type: 'edit' });
+      emit('submit', { product: newProduct });
       return;
     }
 
-    emit('submit', { product: newProduct, type: 'add' });
+    emit('submit', { product: newProduct });
   };
 </script>
 
@@ -90,8 +92,8 @@
           <v-row class="px-3 pb-3">
             <v-text-field
               v-model.trim="selectedProduct.title"
-              label="* Título"
               :rules="rules.title"
+              label="* Título"
               variant="outlined"
               required
             ></v-text-field>
@@ -110,9 +112,9 @@
           <v-row class="px-3 pb-3">
             <v-autocomplete
               v-model.trim="selectedProduct.category"
-              label="* Categoría"
               :items="CATEGORIES"
               :rules="rules.category"
+              label="* Categoría"
               no-data-text="No se encontraron resultados"
               variant="outlined"
               clearable
@@ -124,9 +126,10 @@
             <v-col>
               <v-text-field
                 v-model.trim="selectedProduct.price"
+                :rules="rules.price"
                 label="* Precio"
                 type="number"
-                :rules="rules.price"
+                min="0"
                 variant="outlined"
                 required
               ></v-text-field>
@@ -134,9 +137,10 @@
             <v-col>
               <v-text-field
                 v-model.trim="selectedProduct.stock"
+                :rules="rules.stock"
                 label="* Stock"
                 type="number"
-                :rules="rules.stock"
+                min="0"
                 variant="outlined"
                 required
               ></v-text-field>
@@ -201,12 +205,12 @@
           <v-row class="justify-end ga-2 py-2">
             <v-btn size="large" variant="text" @click="() => emit('closeDialog')"> Cancelar </v-btn>
             <v-btn
+              :loading="isLoading"
               type="submit"
               size="large"
               class="text-none"
               color="primary"
               variant="flat"
-              :loading="isLoading"
             >
               Guardar
             </v-btn>
