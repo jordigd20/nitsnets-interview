@@ -21,6 +21,11 @@ export default defineNuxtConfig({
       template: {
         transformAssetUrls
       }
+    },
+    server: {
+      watch: {
+        usePolling: true
+      }
     }
   },
   app: {
