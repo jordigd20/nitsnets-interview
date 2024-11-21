@@ -111,7 +111,7 @@
     >
     </v-empty-state>
 
-    <main v-else>
+    <div v-else>
       <h1 class="mb-6">Lista de productos</h1>
 
       <div class="d-flex justify-space-between align-center ga-4 flex-wrap">
@@ -165,6 +165,8 @@
       </div>
 
       <v-data-table
+        id="products-table"
+        class=""
         :headers="headers"
         :items="productsStore.products"
         :sort-by="sortBy"
@@ -173,10 +175,18 @@
         items-per-page="10"
         no-data-text="No se encontraron productos"
       >
+        <template #[`item.sizes`]="{ item }">
+          {{ item.sizes.length === 0 ? 'Sin tallas' : item.sizes.join(', ') }}
+        </template>
+
         <template #[`item.isNewCollection`]="{ item }">
           <v-chip :color="item.isNewCollection ? 'green' : 'red'" size="small" label>{{
-            item.isNewCollection
+            item.isNewCollection ? 'Activo' : 'Inactivo'
           }}</v-chip>
+        </template>
+
+        <template #[`item.price`]="{ item }">
+          {{ item.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }) }}
         </template>
 
         <template #[`item.actions`]="{ item }">
@@ -222,6 +232,6 @@
           </div>
         </template>
       </v-data-table>
-    </main>
+    </div>
   </NuxtLayout>
 </template>
