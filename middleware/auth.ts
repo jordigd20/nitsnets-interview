@@ -1,7 +1,6 @@
 import type { AuthResponse } from '~/interfaces';
 
 export default defineNuxtRouteMiddleware(async () => {
-  console.log('Middleware: auth');
   const token = useCookie('token').value;
   const authStore = useAuthStore();
 
