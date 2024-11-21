@@ -11,14 +11,22 @@
   padding: 1rem;
 }
 
-.layout-container {
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
 .alert-error {
   background-color: #fee2e2;
   color: #b00020;
+}
+
+#products-table {
+  border: 1px solid #ccc;
+  margin-top: 15px;
+  border-radius: 6px;
+
+}
+
+#products-table thead {
+  background-color: #f4f7fa;
+}
+
+#products-table thead th {
+  font-weight: 600;
 }

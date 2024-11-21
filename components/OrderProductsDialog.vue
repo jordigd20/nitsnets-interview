@@ -124,7 +124,7 @@
 
   .ghost {
     opacity: 0.5;
-    background: #dcedff;
+    background: #e3f2fd;
   }
 
   .flip-list-move {
