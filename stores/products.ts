@@ -5,16 +5,11 @@ export const useProductsStore = defineStore('products', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const fetchProducts = async (token: string) => {
+  const fetchProducts = async () => {
     isLoading.value = true;
 
     const { data, error: responseError } = await useFetch<ProductsResponse>(
-      `${BASE_API_URL}/products`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      `${BASE_API_URL}/products`
     );
 
     if (responseError.value || !data.value) {
@@ -31,11 +26,14 @@ export const useProductsStore = defineStore('products', () => {
     return products.value.find((product) => product.id === productId);
   };
 
-  const addProduct = async (product: Product) => {
+  const addProduct = async (product: Product, token: string) => {
     isLoading.value = true;
 
     const response = await $fetch<Product>(`${BASE_API_URL}/products`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: product
     });
 
@@ -52,11 +50,14 @@ export const useProductsStore = defineStore('products', () => {
     isLoading.value = false;
   };
 
-  const editProduct = async (product: Product) => {
+  const editProduct = async (product: Product, token: string) => {
     isLoading.value = true;
 
     const response = await $fetch<Product>(`${BASE_API_URL}/products/${product.id}`, {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: product
     });
 
@@ -70,12 +71,17 @@ export const useProductsStore = defineStore('products', () => {
     isLoading.value = false;
   };
 
-  const deleteProduct = async (productId: number) => {
+  const deleteProduct = async (productId: number, token: string) => {
     isLoading.value = true;
 
     const response = await $fetch<{ message: string; status: string }>(
       `${BASE_API_URL}/products/${productId}`,
-      { method: 'DELETE' }
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
     );
 
     if (!response) {
@@ -88,11 +94,14 @@ export const useProductsStore = defineStore('products', () => {
     isLoading.value = false;
   };
 
-  const reorderProducts = async (newProducts: Product[]) => {
+  const reorderProducts = async (newProducts: Product[], token: string) => {
     isLoading.value = true;
 
     const response = await $fetch<Product[]>(`${BASE_API_URL}/products/reorder`, {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: newProducts.map((product) => product.id)
     });
 

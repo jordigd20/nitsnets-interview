@@ -26,12 +26,14 @@
   const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
   const productsError = ref<string | null>(null);
 
-  if (authStore.token) {
-    try {
-      await productsStore.fetchProducts(authStore.token);
-    } catch (error) {
-      productsError.value = (error as Error).message;
-    }
+  if (!authStore.token) {
+    navigateTo('/');
+  }
+
+  try {
+    await productsStore.fetchProducts();
+  } catch (error) {
+    productsError.value = (error as Error).message;
   }
 
   const addNewProduct = async ({
@@ -42,7 +44,7 @@
     isDialogActive: Ref<boolean, boolean>;
   }) => {
     try {
-      await productsStore.addProduct(product);
+      await productsStore.addProduct(product, authStore.token!);
       isDialogActive.value = false;
     } catch (error) {
       console.error(error);
@@ -59,7 +61,7 @@
     isDialogActive: Ref<boolean, boolean>;
   }) => {
     try {
-      await productsStore.editProduct(product);
+      await productsStore.editProduct(product, authStore.token!);
       isDialogActive.value = false;
     } catch (error) {
       console.error(error);
@@ -70,7 +72,7 @@
 
   const deleteProduct = async (isDialogActive: Ref<boolean, boolean>, product: Product) => {
     try {
-      await productsStore.deleteProduct(product.id);
+      await productsStore.deleteProduct(product.id, authStore.token!);
       isDialogActive.value = false;
     } catch (error) {
       console.error(error);
@@ -87,7 +89,7 @@
     products: Product[];
   }) => {
     try {
-      await productsStore.reorderProducts(products);
+      await productsStore.reorderProducts(products, authStore.token!);
       sortBy.value = [];
       isDialogActive.value = false;
     } catch (error) {
