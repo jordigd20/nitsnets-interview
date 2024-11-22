@@ -1,11 +1,4 @@
 <script setup lang="ts">
-  import type { Product } from '~/interfaces';
-
-  type SortItem = {
-    key: string;
-    order?: boolean | 'asc' | 'desc';
-  };
-
   definePageMeta({ middleware: 'auth' });
 
   const authStore = useAuthStore();
@@ -23,7 +16,6 @@
     { title: 'Acciones', sortable: false, key: 'actions' }
   ]);
   const search = ref('');
-  const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
   const productsError = ref<string | null>(null);
 
   if (!authStore.token) {
@@ -36,68 +28,9 @@
     productsError.value = (error as Error).message;
   }
 
-  const addNewProduct = async ({
-    product,
-    isDialogActive
-  }: {
-    product: Product;
-    isDialogActive: Ref<boolean, boolean>;
-  }) => {
-    try {
-      await productsStore.addProduct(product, authStore.token!);
-      isDialogActive.value = false;
-    } catch (error) {
-      console.error(error);
-      productsStore.setIsLoading(false);
-      productsStore.setError('Ha ocurrido un error al añadir el producto');
-    }
-  };
-
-  const editProduct = async ({
-    product,
-    isDialogActive
-  }: {
-    product: Product;
-    isDialogActive: Ref<boolean, boolean>;
-  }) => {
-    try {
-      await productsStore.editProduct(product, authStore.token!);
-      isDialogActive.value = false;
-    } catch (error) {
-      console.error(error);
-      productsStore.setIsLoading(false);
-      productsStore.setError('Ha ocurrido un error al editar el producto');
-    }
-  };
-
-  const deleteProduct = async (isDialogActive: Ref<boolean, boolean>, product: Product) => {
-    try {
-      await productsStore.deleteProduct(product.id, authStore.token!);
-      isDialogActive.value = false;
-    } catch (error) {
-      console.error(error);
-      productsStore.setIsLoading(false);
-      productsStore.setError('Ha ocurrido un error al eliminar el producto');
-    }
-  };
-
-  const reorderProducts = async ({
-    isDialogActive,
-    products
-  }: {
-    isDialogActive: Ref<boolean, boolean>;
-    products: Product[];
-  }) => {
-    try {
-      await productsStore.reorderProducts(products, authStore.token!);
-      sortBy.value = [];
-      isDialogActive.value = false;
-    } catch (error) {
-      console.error(error);
-      productsStore.setIsLoading(false);
-      productsStore.setError('Ha ocurrido un error al reordenar los productos');
-    }
-  };
+  const { addNewProduct, editProduct, deleteProduct, reorderProducts } = useProductsCrud(
+    authStore.token!
+  );
 </script>
 
 <template>
@@ -171,7 +104,7 @@
         class=""
         :headers="headers"
         :items="productsStore.products"
-        :sort-by="sortBy"
+        :sort-by="productsStore.sortBy"
         :loading="productsStore.isLoading"
         :search="search"
         items-per-page="10"

@@ -1,7 +1,13 @@
 import type { Product, ProductsResponse } from '~/interfaces';
 
+type SortItem = {
+  key: string;
+  order?: boolean | 'asc' | 'desc';
+};
+
 export const useProductsStore = defineStore('products', () => {
   const products = ref<Product[]>([]);
+  const sortBy = ref<SortItem[]>([{ key: 'id', order: 'asc' }]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -110,6 +116,7 @@ export const useProductsStore = defineStore('products', () => {
     }
 
     products.value = [...newProducts];
+    sortBy.value = [];
     error.value = null;
     isLoading.value = false;
   };
@@ -126,6 +133,7 @@ export const useProductsStore = defineStore('products', () => {
     products,
     isLoading,
     error,
+    sortBy,
     fetchProducts,
     getProductById,
     addProduct,
