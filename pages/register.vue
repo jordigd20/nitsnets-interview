@@ -40,6 +40,12 @@
 
       if (!response) throw new Error('Error al crear la cuenta.');
 
+      // Al utilizar un mock server, el usuario se guarda en localStorage
+      localStorage.setItem(
+        'user',
+        JSON.stringify({ ...response, name: data.name, email: data.email, password: data.password })
+      );
+
       alert.value = {
         display: true,
         type: 'success',

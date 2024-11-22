@@ -21,6 +21,21 @@
     authStore.logout();
     navigateTo('/');
   };
+
+  onMounted(() => {
+    try {
+      const user = authStore.getUserFromStorage();
+
+      authStore.updateUserProperties({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  });
 </script>
 
 <template>
@@ -39,7 +54,8 @@
 
     <v-menu>
       <template #activator="{ props }">
-        <v-btn prepend-icon="mdi-account-circle" v-bind="props" size="large">
+        <v-btn v-if="authStore.user?.name === ''" icon="mdi-account-circle" v-bind="props"></v-btn>
+        <v-btn v-else prepend-icon="mdi-account-circle" v-bind="props" size="large">
           {{ authStore.user?.name }}
         </v-btn>
       </template>

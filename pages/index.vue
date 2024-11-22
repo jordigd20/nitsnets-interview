@@ -8,6 +8,10 @@
 
     await authStore.login(email, password);
   };
+
+  onUnmounted(() => {
+    authStore.error = null;
+  });
 </script>
 
 <template>
