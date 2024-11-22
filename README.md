@@ -1,75 +1,61 @@
-# Nuxt Minimal Starter
+# Nitsnets Prueba Técnica
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Instalación
 
-## Setup
+Es necesario tener instalado Node.js almenos en la versión 18 para adelante. En el caso de usar alguna versión que no sean en las versiones 18.12, 20.9 o 22.0 en adelante, es posible que aparezcan warnings al instalar alguna de las dependencias que usa Nuxt, pero en principio no debería haber problemas.
 
-Make sure to install dependencies:
+En su defecto, he creado también un docker-compose y un dockerfile para poder correr la aplicación en un contenedor de Docker.
+
+A continuación se muestra cómo ejecutar el proyecto en ambos casos. Se puede utilizar el que se prefiera.
+
+## Ejecutar en local
+
+1. Clonar el repositorio
+2. Instalar las dependencias. Yo he usado `npm` pero se puede usar el gestor de paquetes que se prefiera.
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+3. Ejecutar el servidor de desarrollo en `http://localhost:3000`:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+## Ejecutar con Docker
 
-Build the application for production:
+Será necesario tener instalado Docker anteriormente.
+
+1. Clonar el repositorio.
+2. Ejecutar el siguiente comando en la raíz del proyecto:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+docker-compose up --build
 ```
 
-Locally preview production build:
+3. La web estará disponible en `http://localhost:3000` con hot reload por si fuese necesario.
 
-```bash
-# npm
-npm run preview
+## Mock Server
 
-# pnpm
-pnpm preview
+El Mock Server se ha hecho con Postman. La URL es la siguiente: [https://201cf1a4-928b-421c-9baa-fd62d66a6adc.mock.pstmn.io](https://201cf1a4-928b-421c-9baa-fd62d66a6adc.mock.pstmn.io), y aquí se puede ver la [documentación de la API](https://documenter.getpostman.com/view/39917601/2sAYBSkYh3).
 
-# yarn
-yarn preview
+Postman tiene un limite de 1000 peticiones mensuales. Es de las mejores opciones gratuitas que he encontrado así que he creado una cuenta nueva para que haya bastante margen hasta llegar al límite. Si se llegase al límite contactarme y intento solucionarlo.
 
-# bun
-bun run preview
-```
+## Dependencias utilizadas
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- **Framework de Vue**: [Nuxt](https://nuxt.com/)
+- **Framework Javascript**: [Vue.js](https://vuejs.org/)
+- **Librería de componentes**: [Vuetify](https://vuetifyjs.com/en/)
+- **Gestión del estado**: [Pinia](https://pinia.vuejs.org/)
+- **Librería de drag & drop**: [Vuedraggable](https://www.npmjs.com/package/vuedraggable)
+- **Linter**: [ESLint](https://eslint.org/)
+- **Formateador de código**: [Prettier](https://prettier.io/)
+
+## Notas
+
+Se ha utilizado el linter ESLint junto con Prettier y SonarLint para mantener un código limpio y ordenado. Además, se ha intentado seguir el patrón de diseño de Vue.js y Vuetify para mantener una coherencia en el código.
+
+Para el estado global de la aplicación se ha usado Pinia, que es una librería que se integra muy bien con Vue.js y que permite tener un estado global de manera muy sencilla.
+
+Por último para el drag & drop de los productos se ha usado Vuedraggable, que es una librería muy sencilla de usar y que se integra muy bien con Vue.js.
