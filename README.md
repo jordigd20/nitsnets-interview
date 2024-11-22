@@ -52,10 +52,12 @@ Postman tiene un limite de 1000 peticiones mensuales. Es de las mejores opciones
 - **Linter**: [ESLint](https://eslint.org/)
 - **Formateador de código**: [Prettier](https://prettier.io/)
 
-## Notas
-
 Se ha utilizado el linter ESLint junto con Prettier y SonarLint para mantener un código limpio y ordenado. Además, se ha intentado seguir el patrón de diseño de Vue.js y Vuetify para mantener una coherencia en el código.
 
 Para el estado global de la aplicación se ha usado Pinia, que es una librería que se integra muy bien con Vue.js y que permite tener un estado global de manera muy sencilla.
 
 Por último para el drag & drop de los productos se ha usado Vuedraggable, que es una librería muy sencilla de usar y que se integra muy bien con Vue.js.
+
+## Notas
+
+Para utilizar el login y la recuperación de contraseña, es necesario registrarse previamente y utilizar el correo y la contraseña que se ha usado para registrarse. Para esta funcionalidad, se almacena el usuario en el local storage. Se ha hecho de esta forma debido a que el backend es un mock server. En un entorno real, debería ser el backend el que se encargue de la autenticación del usuario.
