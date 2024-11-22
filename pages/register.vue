@@ -1,12 +1,11 @@
 <script setup lang="ts">
-  import type { User } from '~/interfaces/user.interface';
-
   type Alert = {
     display: boolean;
     type: 'error' | 'success' | 'info' | 'warning';
     message: string;
   };
 
+  const authStore = useAuthStore();
   const isLoading = ref(false);
   const alert = ref<Alert>({
     display: false,
@@ -28,23 +27,12 @@
     isLoading.value = true;
 
     try {
-      const response = await $fetch<User>(`${BASE_API_URL}/register`, {
-        method: 'POST',
-        body: {
-          name: data.name,
-          email: data.email,
-          nif: data.nif,
-          password: data.password
-        }
+      await authStore.register({
+        name: data.name,
+        email: data.email,
+        nif: data.nif,
+        password: data.password
       });
-
-      if (!response) throw new Error('Error al crear la cuenta.');
-
-      // Al utilizar un mock server, el usuario se guarda en localStorage
-      localStorage.setItem(
-        'user',
-        JSON.stringify({ ...response, name: data.name, email: data.email, password: data.password })
-      );
 
       alert.value = {
         display: true,

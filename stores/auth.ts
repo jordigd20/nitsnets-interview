@@ -49,6 +49,41 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = false;
   };
 
+  const register = async (data: { name: string; email: string; nif: string; password: string }) => {
+    const response = await $fetch<User>(`${BASE_API_URL}/register`, {
+      method: 'POST',
+      body: {
+        name: data.name,
+        email: data.email,
+        nif: data.nif,
+        password: data.password
+      }
+    });
+
+    if (!response) throw new Error('Error al crear la cuenta.');
+
+    // Al utilizar un mock server, el usuario se guarda en localStorage
+    localStorage.setItem(
+      'user',
+      JSON.stringify({ ...response, name: data.name, email: data.email, password: data.password })
+    );
+  };
+
+  const forgotPassword = async (email: string) => {
+    const response = await $fetch<{ url: string }>(`${BASE_API_URL}/forgot-password`, {
+      method: 'POST',
+      body: { email }
+    });
+
+    if (!response) throw new Error('Error al enviar el correo.');
+
+    const userInStorage = getUserFromStorage();
+
+    if (userInStorage.email !== email) {
+      throw new Error('Usuario no encontrado.');
+    }
+  };
+
   const setAuthData = (data: AuthResponse) => {
     user.value = data.user;
     token.value = data.token;
@@ -84,6 +119,8 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     isAuthenticated,
     login,
+    register,
+    forgotPassword,
     logout,
     getUserFromStorage,
     setAuthData,

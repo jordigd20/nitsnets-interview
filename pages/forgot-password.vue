@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  const authStore = useAuthStore();
   const isLoading = ref(false);
   const error = ref('');
   const isEmailSent = ref(false);
@@ -9,17 +10,12 @@
     isLoading.value = true;
 
     try {
-      const response = await $fetch<{ url: string }>(`${BASE_API_URL}/forgot-password`, {
-        method: 'POST',
-        body: { email }
-      });
-
-      if (!response) throw new Error('Error al enviar el correo.');
+      await authStore.forgotPassword(email);
 
       isEmailSent.value = true;
     } catch (err) {
       console.error(err);
-      error.value = 'Error al enviar el correo.';
+      error.value = (err as Error).message;
     }
 
     isLoading.value = false;
