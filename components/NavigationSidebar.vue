@@ -1,8 +1,15 @@
 <script setup lang="ts">
+  import { useDisplay } from 'vuetify';
+
+  const { lgAndUp } = useDisplay();
   const sidebarStore = useSidebarStore();
   const route = useRoute();
 
   const navigationLinks = ref([{ title: 'Productos', icon: 'mdi-shopping', to: '/dashboard' }]);
+
+  if (lgAndUp.value) {
+    sidebarStore.open();
+  }
 </script>
 
 <template>
