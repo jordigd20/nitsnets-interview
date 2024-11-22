@@ -1,4 +1,4 @@
-export const BASE_API_URL = 'https://fc692e31-74e2-4167-b8a5-76d61603bff9.mock.pstmn.io';
+export const BASE_API_URL = 'https://201cf1a4-928b-421c-9baa-fd62d66a6adc.mock.pstmn.io';
 
 export const CATEGORIES = [
   'Camisetas',
